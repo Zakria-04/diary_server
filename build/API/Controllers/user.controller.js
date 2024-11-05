@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeDiaryFromDB = exports.createNewDiary = exports.loginUser = exports.createNewUser = void 0;
+exports.updateProfile = exports.removeDiaryFromDB = exports.createNewDiary = exports.loginUser = exports.createNewUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_module_1 = __importDefault(require("../Models/user.module"));
 const utils_1 = __importDefault(require("../../res/utils"));
@@ -29,8 +29,9 @@ const createNewUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(200).json({ user: Cres });
     }
     catch (error) {
-        console.error("Error on creating new user", error);
-        res.status(500).json({ error: "failed to create new user" });
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        console.error("Error on updating profile", errorMessage);
+        res.status(500).json({ error: errorMessage });
     }
 });
 exports.createNewUser = createNewUser;
@@ -61,9 +62,9 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     catch (error) {
-        console.error("Error logging user ", error);
-        res.status(500).json({ errorMessage: error.message });
-        return;
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        console.error("Error on updating profile", errorMessage);
+        res.status(500).json({ error: errorMessage });
     }
 });
 exports.loginUser = loginUser;
@@ -84,8 +85,9 @@ const createNewDiary = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(200).json({ user: response });
     }
     catch (error) {
-        console.error("Error on submitting diary data", error.message);
-        res.status(500).json({ error: true, errorMessage: error.message });
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        console.error("Error on updating profile", errorMessage);
+        res.status(500).json({ error: errorMessage });
     }
 });
 exports.createNewDiary = createNewDiary;
@@ -111,8 +113,36 @@ const removeDiaryFromDB = (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(200).json({ user: response });
     }
     catch (error) {
-        console.error("Error removing diary from db", error.message);
-        res.status(500).json({ error: error.message });
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        console.error("Error on updating profile", errorMessage);
+        res.status(500).json({ error: errorMessage });
     }
 });
 exports.removeDiaryFromDB = removeDiaryFromDB;
+//* update profile from db
+const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { updateData, userID } = req.body;
+        // find user based on ID
+        const user = yield (0, utils_1.default)(userID);
+        if (!user) {
+            res.status(404).json({ error: "user has not been found" });
+            return;
+        }
+        // get and hash the user password to make it secure
+        const updateAndHashPass = yield bcryptjs_1.default.hash(updateData.userPass, 10);
+        // update the user data
+        user.userName = updateData.userName || user.userName;
+        user.userPass = updateAndHashPass || user.userPass;
+        // save the updated data into db
+        const response = yield user.save();
+        // response
+        res.status(200).json({ user: response });
+    }
+    catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        console.error("Error on updating profile", errorMessage);
+        res.status(500).json({ error: errorMessage });
+    }
+});
+exports.updateProfile = updateProfile;
