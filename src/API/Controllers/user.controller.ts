@@ -16,9 +16,11 @@ const createNewUser = async (req: Request, res: Response): Promise<void> => {
       userPass: hashPass,
     });
     res.status(200).json({ user: Cres });
-  } catch (error) {
-    console.error("Error on creating new user", error);
-    res.status(500).json({ error: "failed to create new user" });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    console.error("Error on updating profile", errorMessage);
+    res.status(500).json({ error: errorMessage });
   }
 };
 
@@ -52,10 +54,11 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
       res.status(200).json({ user });
       return;
     }
-  } catch (error: any) {
-    console.error("Error logging user ", error);
-    res.status(500).json({ errorMessage: error.message });
-    return;
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    console.error("Error on updating profile", errorMessage);
+    res.status(500).json({ error: errorMessage });
   }
 };
 
@@ -77,9 +80,11 @@ const createNewDiary = async (req: Request, res: Response): Promise<void> => {
 
     // Respond with the updated user data
     res.status(200).json({ user: response });
-  } catch (error: any) {
-    console.error("Error on submitting diary data", error.message);
-    res.status(500).json({ error: true, errorMessage: error.message });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    console.error("Error on updating profile", errorMessage);
+    res.status(500).json({ error: errorMessage });
   }
 };
 
@@ -109,10 +114,51 @@ const removeDiaryFromDB = async (
 
     const response = await user.save();
     res.status(200).json({ user: response });
-  } catch (error: any) {
-    console.error("Error removing diary from db", error.message);
-    res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    console.error("Error on updating profile", errorMessage);
+    res.status(500).json({ error: errorMessage });
   }
 };
 
-export { createNewUser, loginUser, createNewDiary, removeDiaryFromDB };
+//* update profile from db
+const updateProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { updateData, userID } = req.body;
+
+    // find user based on ID
+    const user = await findUserByID(userID);
+
+    if (!user) {
+      res.status(404).json({ error: "user has not been found" });
+      return;
+    }
+
+    // get and hash the user password to make it secure
+    const updateAndHashPass = await bcrypt.hash(updateData.userPass, 10);
+
+    // update the user data
+    user.userName = updateData.userName || user.userName;
+    user.userPass = updateAndHashPass || user.userPass;
+
+    // save the updated data into db
+    const response = await user.save();
+
+    // response
+    res.status(200).json({ user: response });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    console.error("Error on updating profile", errorMessage);
+    res.status(500).json({ error: errorMessage });
+  }
+};
+
+export {
+  createNewUser,
+  loginUser,
+  createNewDiary,
+  removeDiaryFromDB,
+  updateProfile,
+};

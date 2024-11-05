@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createNewDiary = exports.loginUser = exports.createNewUser = void 0;
+exports.removeDiaryFromDB = exports.createNewDiary = exports.loginUser = exports.createNewUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_module_1 = __importDefault(require("../Models/user.module"));
+const utils_1 = __importDefault(require("../../res/utils"));
 //* creating a new user
 const createNewUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userName, userPass } = req.body;
@@ -68,19 +69,50 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.loginUser = loginUser;
 //* create a new diary and push it to the db
 const createNewDiary = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { diaryData } = req.body;
-    const user = yield user_module_1.default.findById("67289845c1013d88aa9708f8");
-    if (user) {
-        user.userDiaryData.push(diaryData);
-        user
-            .save()
-            .then((response) => {
-            res.status(200).json({ resData: response });
-        })
-            .catch((err) => {
-            res.status(500).json({ error: true, errM: err.message });
-        });
-        return;
+    try {
+        const { userID, diaryData } = req.body;
+        // find user based on ID
+        const user = yield (0, utils_1.default)(userID);
+        if (!user) {
+            res.status(404).json({ error: "user has not been found!" });
+            return;
+        }
+        user.userDiaryData.unshift(diaryData);
+        // save the updated user data
+        const response = yield user.save();
+        // Respond with the updated user data
+        res.status(200).json({ user: response });
+    }
+    catch (error) {
+        console.error("Error on submitting diary data", error.message);
+        res.status(500).json({ error: true, errorMessage: error.message });
     }
 });
 exports.createNewDiary = createNewDiary;
+//* delete diary item from db
+const removeDiaryFromDB = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userID, diaryID } = req.body;
+        const user = yield (0, utils_1.default)(userID);
+        if (!user) {
+            res.status(500).json({ error: "user has not been found" });
+            return;
+        }
+        // get user based on id
+        function checkID(getID) {
+            return getID.id === diaryID;
+        }
+        // get index of the item
+        const getDiaryIndex = user.userDiaryData.findIndex(checkID);
+        if (getDiaryIndex !== -1) {
+            user.userDiaryData.splice(getDiaryIndex, 1);
+        }
+        const response = yield user.save();
+        res.status(200).json({ user: response });
+    }
+    catch (error) {
+        console.error("Error removing diary from db", error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.removeDiaryFromDB = removeDiaryFromDB;
