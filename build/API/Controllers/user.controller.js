@@ -134,6 +134,7 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // update the user data
         user.userName = updateData.userName || user.userName;
         user.userPass = updateAndHashPass || user.userPass;
+        user.userDiaryData = updateData.userDiaryData || user.userDiaryData;
         // save the updated data into db
         const response = yield user.save();
         // response

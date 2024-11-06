@@ -141,6 +141,7 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
     // update the user data
     user.userName = updateData.userName || user.userName;
     user.userPass = updateAndHashPass || user.userPass;
+    user.userDiaryData = updateData.userDiaryData || user.userDiaryData;
 
     // save the updated data into db
     const response = await user.save();
