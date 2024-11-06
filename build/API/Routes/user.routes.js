@@ -8,4 +8,5 @@ userRouter.post("/login_user", user_controller_1.loginUser);
 userRouter.post("/create_diary", user_controller_1.createNewDiary);
 userRouter.post("/remove_diary_from_db", user_controller_1.removeDiaryFromDB);
 userRouter.post("/update_profile", user_controller_1.updateProfile);
+userRouter.post("/find_and_update_note", user_controller_1.findAndUpdateNote);
 exports.default = userRouter;

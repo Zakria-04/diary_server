@@ -141,7 +141,6 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
     // update the user data
     user.userName = updateData.userName || user.userName;
     user.userPass = updateAndHashPass || user.userPass;
-    user.userDiaryData = updateData.userDiaryData || user.userDiaryData;
 
     // save the updated data into db
     const response = await user.save();
@@ -156,10 +155,39 @@ const updateProfile = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+//* find and update note from db
+const findAndUpdateNote = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userID, updateData, noteID } = req.body;
+    const user = await findUserByID(userID);
+
+    if (!user) {
+      res.status(404).json("user has not been found");
+      return;
+    }
+
+    const findNote = user.userDiaryData.find((getID) => getID.id === noteID);
+    if (findNote) {
+      findNote.title = updateData.title || findNote.title;
+      findNote.textArea = updateData.textArea || findNote.textArea;
+    }
+    const response = await user.save();
+    res.status(200).json({ user: response });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    res.status(500).json({ error: errorMessage });
+  }
+};
+
 export {
   createNewUser,
   loginUser,
   createNewDiary,
   removeDiaryFromDB,
   updateProfile,
+  findAndUpdateNote,
 };

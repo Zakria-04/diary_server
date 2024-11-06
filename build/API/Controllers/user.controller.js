@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateProfile = exports.removeDiaryFromDB = exports.createNewDiary = exports.loginUser = exports.createNewUser = void 0;
+exports.findAndUpdateNote = exports.updateProfile = exports.removeDiaryFromDB = exports.createNewDiary = exports.loginUser = exports.createNewUser = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const user_module_1 = __importDefault(require("../Models/user.module"));
 const utils_1 = __importDefault(require("../../res/utils"));
@@ -134,7 +134,6 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // update the user data
         user.userName = updateData.userName || user.userName;
         user.userPass = updateAndHashPass || user.userPass;
-        user.userDiaryData = updateData.userDiaryData || user.userDiaryData;
         // save the updated data into db
         const response = yield user.save();
         // response
@@ -147,3 +146,26 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.updateProfile = updateProfile;
+//* find and update note from db
+const findAndUpdateNote = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userID, updateData, noteID } = req.body;
+        const user = yield (0, utils_1.default)(userID);
+        if (!user) {
+            res.status(404).json("user has not been found");
+            return;
+        }
+        const findNote = user.userDiaryData.find((getID) => getID.id === noteID);
+        if (findNote) {
+            findNote.title = updateData.title || findNote.title;
+            findNote.textArea = updateData.textArea || findNote.textArea;
+        }
+        const response = yield user.save();
+        res.status(200).json({ user: response });
+    }
+    catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+        res.status(500).json({ error: errorMessage });
+    }
+});
+exports.findAndUpdateNote = findAndUpdateNote;
