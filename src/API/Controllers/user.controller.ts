@@ -30,14 +30,19 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (!user || !user.userPass) {
-      res.status(401).json({ error: "UserName or Password are incorrect!" });
+      res.status(401).json({
+        type: "notUser",
+        error: "UserName or Password are incorrect!",
+      });
       return;
     }
 
     const isPasswordValid = await bcrypt.compare(userPass, user.userPass);
 
     if (!isPasswordValid) {
-      res.status(401).json({ error: "Password is incorrect!" });
+      res
+        .status(401)
+        .json({ type: "password", error: "Password is incorrect!" });
       return;
     }
 

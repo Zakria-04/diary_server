@@ -8,6 +8,11 @@ const year = getDate.getFullYear();
 const fullDate = `${day},${month},${year}`;
 
 const diarySchema = new Schema({
+  authID: {
+    type: String,
+    required: true,
+  },
+
   title: {
     type: String,
     required: true,
