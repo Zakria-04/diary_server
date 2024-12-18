@@ -7,29 +7,32 @@ const year = getDate.getFullYear();
 
 const fullDate = `${day},${month},${year}`;
 
-const diarySchema = new Schema({
-  authID: {
-    type: String,
-    required: true,
-  },
+const diarySchema = new Schema(
+  {
+    authID: {
+      type: String,
+      required: true,
+    },
 
-  title: {
-    type: String,
-    required: true,
-    minLength: [10, "title must be at least 10 characters"],
-  },
+    title: {
+      type: String,
+      required: true,
+      minLength: [10, "title must be at least 10 characters"],
+    },
 
-  context: {
-    type: String,
-    required: true,
-    maxLength: [300, "max characters must be 70"],
-  },
+    context: {
+      type: String,
+      required: true,
+      maxLength: [300, "max characters must be 70"],
+    },
 
-  timeStamp: {
-    type: String,
-    default: fullDate,
+    timeStamp: {
+      type: String,
+      default: fullDate,
+    },
   },
-});
+  { timestamps: true }
+);
 
 const DIARY_MODEL = model("diary", diarySchema);
 export default DIARY_MODEL;
