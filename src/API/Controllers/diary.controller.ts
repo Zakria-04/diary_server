@@ -64,7 +64,23 @@ const deleteDiary = async (req: Request, res: Response) => {
 const updateDiary = async (req: Request, res: Response) => {
   const { diaryID, title, context } = req.body;
   try {
-    const selectedDiary = await DIARY_MODEL.findByIdAndUpdate({})
+    if (diaryID === undefined) {
+      res.status(401).json({ error: "invalid or missing diary id" });
+      return;
+    }
+
+    const selectedDiary = await DIARY_MODEL.findOneAndUpdate(
+      { _id: diaryID },
+      { title, context },
+      { new: true }
+    );
+
+    if (!selectedDiary) {
+      res.status(404).json({ error: "No diaries found for the provided id!" });
+      return;
+    }
+
+    res.status(200).json({ message: "diary has been updated successfully" });
   } catch (error) {
     errorMessage(error, res);
   }
