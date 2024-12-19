@@ -5,8 +5,7 @@
   "scripts": {
     "build": "rimraf ./build && tsc",
     "dev": "nodemon",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build && node ./build/server.js"
+    "start": "vercel dev"
   },
   "keywords": [],
   "author": "",
