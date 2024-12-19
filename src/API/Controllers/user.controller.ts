@@ -5,7 +5,10 @@ import bcrypt from "bcryptjs";
 
 // create new user
 const createNewUser = async (req: Request, res: Response) => {
-  const { userName, userPass, email } = req.body;
+  let { userName, userPass, email } = req.body;
+  if (!email || email.trim() === "") {
+    email = null;
+  }
   try {
     const hashPass = await bcrypt.hash(userPass, 10);
 

@@ -5,14 +5,15 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    minLength: [3, "UserName must be at least 3 characters long"],
+    minLength: [3, "Username must be at least 3 characters long"],
     maxLength: [20, "Username cannot be more than 20 characters"],
     trim: true,
     validate: {
       validator: function (value) {
-        return /^[a-z]+$/.test(value);
+        return /^[a-z._]+$/.test(value);
       },
-      message: "Username must only contain lowercase letters (a-z).",
+      message:
+        "Username must only contain lowercase letters (a-z), '.' (dot), and '_' (underscore).",
     },
   },
 
@@ -25,7 +26,7 @@ const userSchema = new Schema({
   email: {
     type: String,
     unique: true,
-    default: "",
+    default: null,
     match: [/.+@.+\..+/, "Please enter a valid email address"],
   },
 });

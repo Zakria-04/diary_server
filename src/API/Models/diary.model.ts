@@ -17,7 +17,7 @@ const diarySchema = new Schema(
     title: {
       type: String,
       required: true,
-      minLength: [10, "title must be at least 10 characters"],
+      minLength: [5, "title must be at least 10 characters"],
     },
 
     context: {

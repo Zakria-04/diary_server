@@ -50,6 +50,7 @@ const deleteDiary = async (req: Request, res: Response) => {
 
     if (!user) {
       res.status(404).json("user not found!");
+      return
     }
 
     // check if one of the provided diary auth ids does not match with the auth id to prevent deleting other users diary
@@ -59,7 +60,7 @@ const deleteDiary = async (req: Request, res: Response) => {
       if (findDiaryDocument?.authID !== authID) {
         res.status(404).json({
           error:
-            "something went wrong, diary auth id does not match with the auth id",
+            "something went wrong, diary auth id does not match with any of the provided ids",
         });
         return;
       }
