@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const diary_controller_1 = require("../Controllers/diary.controller");
+const diaryRouter = (0, express_1.Router)();
+diaryRouter.post("/create_diary", diary_controller_1.createDiary);
+diaryRouter.post("/get_diary", diary_controller_1.getAllUserDiary);
+diaryRouter.delete("/delete_diary", diary_controller_1.deleteDiary);
+diaryRouter.patch("/update_diary", diary_controller_1.updateDiary);
+exports.default = diaryRouter;
