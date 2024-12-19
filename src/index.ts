@@ -27,8 +27,12 @@ mongoose.connection.on("error", (err) => {
   console.error("mongoose connection error", err);
 });
 
+app.get("/health", (req, res) => {
+  res.send("<h1>Server is live and running!</h1>");
+});
+
 app.get("/live", (req, res) => {
-  res.status(200).json({ live: true, status: "server is live!"});
+  res.status(200).json({ live: true, status: "server is live!" });
 });
 
 export default app;
