@@ -83,15 +83,15 @@ const deleteDiary = async (req: Request, res: Response) => {
 };
 
 const updateDiary = async (req: Request, res: Response) => {
-  const { diaryID, title, context } = req.body;
+  const { _id, title, context } = req.body;
   try {
-    if (diaryID === undefined) {
+    if (_id === undefined) {
       res.status(401).json({ error: "invalid or missing diary id" });
       return;
     }
 
     const selectedDiary = await DIARY_MODEL.findOneAndUpdate(
-      { _id: diaryID },
+      { _id: _id },
       { title, context },
       { new: true }
     );
