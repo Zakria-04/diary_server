@@ -3,20 +3,32 @@ import USER_MODEL from "../Models/user.model";
 import { errorMessage } from "../../res/utils";
 import bcrypt from "bcryptjs";
 
+type UserInfo = {
+  userName: string;
+  userPass: string;
+  email?: string;
+};
+
 // create new user
 const createNewUser = async (req: Request, res: Response) => {
   let { userName, userPass, email } = req.body;
   if (!email || email.trim() === "") {
-    email = null;
+    email = undefined;
   }
+
   try {
     const hashPass = await bcrypt.hash(userPass, 10);
 
-    const Cres = await USER_MODEL.create({
+    const userData: UserInfo = {
       userName,
       userPass: hashPass,
-      email,
-    });
+    };
+
+    if (email) {
+      userData.email = email;
+    }
+
+    const Cres = await USER_MODEL.create(userData);
 
     res.status(200).json({ user: Cres });
   } catch (error: unknown) {
